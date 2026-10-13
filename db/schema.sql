@@ -51,12 +51,21 @@ CREATE TABLE diagnosis (
 
 -- 약물 마스터 (Phase 2 병용금기 DUR용). 코드 체계는 멘토링 후 확정
 CREATE TABLE drug (
-    drug_id     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    drug_code   VARCHAR(20) UNIQUE,             -- 제품 코드 (KDC 등)
-    atc_code    VARCHAR(10),                    -- 성분 분류 코드 (ATC)
-    drug_name   VARCHAR(200) NOT NULL,
-    ingredient  VARCHAR(200)                    -- 성분명
+    drug_id         INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    drug_code       VARCHAR(20) UNIQUE,   -- 기타 제품 코드(KD 13자리 등, 필요 시)
+    edi_code        VARCHAR(9),           -- 보험(EDI) 제품코드 9자리. 약물 매핑 기준 키
+    ingredient_code VARCHAR(9),           -- 주성분코드 9자리
+    atc_code        VARCHAR(10),          -- WHO ATC 코드
+    drug_name       VARCHAR(200) NOT NULL,
+    ingredient      VARCHAR(200),         -- 성분명
+    valid_from      DATE,                 -- 이 코드 정보의 적용 시작일
+    valid_to        DATE,                 -- 적용 종료일 (NULL = 현재 유효)
+    CONSTRAINT drug_valid_period_chk
+        CHECK (valid_to IS NULL OR valid_from IS NULL OR valid_to >= valid_from)
 );
+CREATE UNIQUE INDEX ux_drug_edi_period
+    ON drug (edi_code, valid_from) WHERE edi_code IS NOT NULL;
+CREATE INDEX ix_drug_ingredient_code ON drug (ingredient_code);
 
 -- 처방: 방문 1건에 약 여러 개
 CREATE TABLE prescription (
