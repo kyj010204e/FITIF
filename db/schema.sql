@@ -11,6 +11,7 @@
 -- ---------------------------------------------------------------------
 -- 1) 기존 테이블 정리 (자식 → 부모 순서)
 -- ---------------------------------------------------------------------
+DROP TABLE IF EXISTS source_document;
 DROP TABLE IF EXISTS prescription;
 DROP TABLE IF EXISTS diagnosis;
 DROP TABLE IF EXISTS vital_sign;
@@ -39,6 +40,18 @@ CREATE TABLE encounter (
     member_id    INT NOT NULL REFERENCES member(member_id),
     visit_date   DATE NOT NULL,
     source_type  VARCHAR(20)                    -- 데이터 출처 예: 'OCR', 'SYNTHETIC'
+);
+
+CREATE TABLE source_document (
+    document_id         INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    encounter_id        INT REFERENCES encounter(encounter_id),  -- 어느 방문의 문서인지 (아직 모르면 NULL)
+    file_name           VARCHAR(255) NOT NULL,
+    file_type           VARCHAR(10),            -- 'pdf', 'jpg'
+    storage_path        VARCHAR(500) NOT NULL,  -- 원본 파일 저장 위치
+    sha256              CHAR(64) NOT NULL,      -- 원본이 바뀌지 않았는지 검증용
+    ocr_text_raw        TEXT,                   -- OCR 원문 (수정 금지)
+    ocr_text_corrected  TEXT,                   -- 오타 교정본
+    uploaded_at         TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 진단
