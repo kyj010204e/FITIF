@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.streamlit/secrets.toml
+
+# Medical data
+inputs/
+outputs/
+ground_truth/
+
+# Models
+model/
+models/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Experiments & backups
+experiments/
+*_backup.py
+app_before_*.py
+
+# Logs
+*.log

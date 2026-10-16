@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 12px;
+  background: #f1f3f7;
+  font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+  color: #202632;
+}
+.toolbar {
+  max-width: 850px;
+  margin: 0 auto 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.paper {
+  width: 100%;
+  max-width: 850px;
+  min-height: 1000px;
+  margin: 0 auto 20px;
+  padding: 40px 34px;
+  background: white;
+  box-shadow: 0 5px 18px #00000020;
+}
+.paper-title {
+  text-align: center;
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0 0 28px;
+}
+.paper table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  margin: 12px 0 22px;
+}
+.paper td, .paper th {
+  border: 1px solid #9da5b0;
+  padding: 8px 10px;
+  vertical-align: middle;
+  font-size: 13px;
+  min-width: 30px;
+  overflow-wrap: anywhere;
+}
+.editable {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background .15s;
+}
+.editable:hover {
+  background: #eaf2ff;
+  outline: 2px solid #74a5ff;
+}
+.editable:focus {
+  outline: 2px solid #2563eb;
+}
+.text-block {
+  padding: 8px;
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.suspect {
+  color: #202632;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.hint { color: #526071; font-size: 12px; }
+.legend { color: #a92828; font-size: 12px; }
+.footer {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto 20px;
+  background: white;
+  padding: 18px;
+  border-radius: 10px;
+}
+.footer label { font-size: 13px; cursor: pointer; }
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 18px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled { background: #9ca3af; cursor: not-allowed; }
+button.secondary { background: #e5e7eb; color: #202632; }
+#confirmBtn { margin-top: 14px; width: 100%; }
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #0008;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  z-index: 10;
+}
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 22px;
+  width: min(600px, 100%);
+}
+.modal textarea {
+  width: 100%;
+  min-height: 170px;
+  padding: 13px;
+  font-size: 15px;
+  border: 1px solid #b9c0c9;
+  border-radius: 8px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+@media(max-width: 600px) {
+  body { padding: 0; }
+  .toolbar { padding: 12px; }
+  .paper {
+    min-height: 500px;
+    padding: 18px 12px;
+    box-shadow: none;
+  }
+  .paper-title { font-size: 18px; }
+  .paper td, .paper th {
+    padding: 7px 5px;
+    font-size: 12px;
+    min-width: 18px;
+  }
+  .footer { border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div>
+    <strong>FITIF · 문서 확인</strong>
+    <div class="hint">수정할 글자나 표의 칸을 클릭하세요.</div>
+  </div>
+
+</div>
+
+<div id="pages"></div>
+
+<div class="footer">
+  <label>
+    <input id="agree" type="checkbox">
+    원본 문서와 인식 결과를 비교하여 확인했습니다.
+  </label>
+  <button id="confirmBtn" disabled>확인 및 JSON 확정</button>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3>인식 내용 수정</h3>
+    <p class="hint">원본 이미지와 대조해 정확한 내용으로 수정해 주세요.</p>
+    <textarea id="editValue"></textarea>
+    <div class="actions">
+      <button class="secondary" id="cancelEdit">취소</button>
+      <button id="saveEdit">수정 적용</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let documentData = null;
+let currentJob = null;
+let editTarget = null;
+
+function send(type, extra = {}) {
+  window.parent.postMessage({
+    isStreamlitMessage: true,
+    type: type,
+    ...extra
+  }, "*");
+}
+function resizeFrame() {
+  send("streamlit:setFrameHeight", {
+    height: Math.ceil(document.body.scrollHeight + 25)
+  });
+}
+function normalizeView(text) {
+  return String(text ?? "")
+    .replaceAll("\\r\\n", "\n")
+    .replaceAll("\\n", "\n")
+    .replaceAll("\\t", "    ")
+    .replaceAll("\r\n", "\n");
+}
+function suspicious(text) {
+  const s = String(text ?? "");
+  // 실제 confidence가 아니라 보수적인 형식 이상 신호
+  return s.includes("�") ||
+    s.includes("\\n") ||
+    s.includes("\\t") ||
+    /\$\s*\^|\{\{|\}\}/.test(s) ||
+    /[□■�]{3,}/.test(s);
+}
+function editable(element, cell, label) {
+  element.classList.add("editable");
+  element.tabIndex = 0;
+  element.setAttribute("role", "button");
+  element.title = "눌러서 수정";
+  element.textContent = normalizeView(cell.text);
+
+  if (suspicious(cell.text)) {
+
+  }
+
+  function activate() {
+    editTarget = { cell, element };
+    document.getElementById("editValue").value =
+      normalizeView(cell.text);
+    document.getElementById("overlay").style.display = "flex";
+    document.getElementById("editValue").focus();
+  }
+  element.addEventListener("click", activate);
+  element.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      activate();
+    }
+  });
+}
+function render() {
+  const root = document.getElementById("pages");
+  root.replaceChildren();
+
+  (documentData?.pages || []).forEach((page, pi) => {
+    const paper = document.createElement("div");
+    paper.className = "paper";
+
+    const title = document.createElement("div");
+    title.className = "paper-title";
+    title.textContent = `인식 문서 · ${page.page ?? pi + 1}페이지`;
+    paper.appendChild(title);
+
+    (page.contents || []).forEach((content) => {
+      if (content.type !== "table") {
+        const element = document.createElement("div");
+        element.className = "text-block";
+        editable(element, content, "문단");
+        paper.appendChild(element);
+        return;
+      }
+
+      const table = document.createElement("table");
+      const tbody = document.createElement("tbody");
+
+      (content.rows || []).forEach((row) => {
+        const tr = document.createElement("tr");
+
+        row.forEach((cell) => {
+          const td = document.createElement("td");
+          td.colSpan = Math.max(1, Number(cell.colspan) || 1);
+          td.rowSpan = Math.max(1, Number(cell.rowspan) || 1);
+          editable(td, cell, "표 셀");
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      paper.appendChild(table);
+    });
+
+    root.appendChild(paper);
+  });
+  resizeFrame();
+}
+
+document.getElementById("cancelEdit").onclick = () => {
+  document.getElementById("overlay").style.display = "none";
+  editTarget = null;
+};
+
+document.getElementById("saveEdit").onclick = () => {
+  if (!editTarget) return;
+
+  const newValue = document.getElementById("editValue").value;
+  editTarget.cell.text = newValue;
+  editTarget.element.textContent = normalizeView(newValue);
+
+
+  document.getElementById("overlay").style.display = "none";
+  editTarget = null;
+  resizeFrame();
+};
+
+document.getElementById("agree").onchange = (e) => {
+  document.getElementById("confirmBtn").disabled = !e.target.checked;
+};
+
+document.getElementById("confirmBtn").onclick = () => {
+  if (!document.getElementById("agree").checked) return;
+  send("streamlit:setComponentValue", {
+    value: {
+      confirmed: true,
+      document: documentData
+    }
+  });
+};
+
+window.addEventListener("message", (event) => {
+  if (event.data?.type !== "streamlit:render") return;
+
+  const args = event.data.args || {};
+  if (args.job_id !== currentJob) {
+    currentJob = args.job_id;
+    documentData = structuredClone(args.document);
+    document.getElementById("agree").checked = false;
+    document.getElementById("confirmBtn").disabled = true;
+    render();
+  }
+  resizeFrame();
+});
+
+window.addEventListener("load", () => {
+  send("streamlit:componentReady", { apiVersion: 1 });
+  resizeFrame();
+});
+
+new ResizeObserver(resizeFrame).observe(document.body);
+</script>
+</body>
+</html>
