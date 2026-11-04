@@ -18,7 +18,7 @@ FITIF Health Data API
 """
 
 from datetime import datetime
-
+from .routers.glucose import router as glucose_router
 import psycopg2
 from fastapi import FastAPI, HTTPException, Query
 
@@ -35,7 +35,8 @@ app = FastAPI(
     description="FITIF 건강정보 조회 및 분석 백엔드",
     version="0.1.0"
 )
-
+# 사용자 수동 혈당 저장 API 등록
+app.include_router(glucose_router)
 
 # ==============================================
 # 2. 기본 API

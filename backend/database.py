@@ -85,3 +85,53 @@ def get_connection():
         # SELECT만 허용하는 읽기 전용 트랜잭션
         options="-c default_transaction_read_only=on"
     )
+
+
+def get_write_connection():
+    """
+    PostgreSQL 데이터 저장을 위한 연결을 생성한다.
+
+    기존 get_connection()과의 차이:
+        get_connection():
+            SELECT 조회용, 읽기 전용 트랜잭션
+
+        get_write_connection():
+            INSERT 등의 저장 작업용 연결
+
+    주의:
+        이 함수는 쓰기 가능한 연결을 요청할 뿐,
+        PostgreSQL 사용자에게 새로운 권한을
+        부여하는 것은 아니다.
+    """
+
+    required_keys = [
+        "DB_HOST",
+        "DB_PORT",
+        "DB_NAME",
+        "DB_USER",
+        "DB_PASSWORD",
+    ]
+
+    missing = [
+        key for key in required_keys
+        if not os.getenv(key)
+    ]
+
+    if missing:
+        raise RuntimeError(
+            "필수 DB 환경변수 누락: "
+            + ", ".join(missing)
+        )
+
+    return psycopg2.connect(
+        host=os.environ["DB_HOST"],
+        port=int(os.environ["DB_PORT"]),
+        dbname=os.environ["DB_NAME"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        connect_timeout=5,
+
+        # 기존 조회 연결과 달리
+        # 읽기 전용 트랜잭션 옵션을 설정하지 않는다.
+        # 실제 쓰기 가능 여부는 DB 권한에 따라 결정된다.
+    )
