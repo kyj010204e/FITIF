@@ -1,0 +1,644 @@
+
+/* ==========================================
+   1. FITIF 공통 설정 및 디자인 변수
+   ========================================== */
+
+:root {
+  font-family: "Noto Sans KR", Arial, sans-serif;
+  font-synthesis: none;
+
+  color: #203d36;
+  background: #f5f8f7;
+
+  --fitif-primary: #127663;
+  --fitif-primary-light: #e5f4ed;
+  --fitif-text: #203d36;
+  --fitif-muted: #597068;
+  --fitif-border: #dfe9e4;
+  --fitif-bg: #f5f8f7;
+  --fitif-white: #ffffff;
+  --fitif-danger: #b44443;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/* ==========================================
+   2. 앱 공통 레이아웃
+   ========================================== */
+
+.app-shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+  background: var(--fitif-bg);
+}
+
+/* 상단 헤더 */
+
+.app-header {
+  min-height: 64px;
+  padding: 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--fitif-white);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.demo-badge {
+  padding: 5px 10px;
+  border-radius: 999px;
+
+  background: var(--fitif-primary-light);
+  color: var(--fitif-primary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 페이지 콘텐츠 */
+
+.app-content {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 16px 20px 24px;
+}
+
+/* 하단 내비게이션 */
+
+.bottom-navigation {
+  display: flex;
+  align-items: stretch;
+
+  min-height: 72px;
+  padding: 0 8px env(safe-area-inset-bottom);
+
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+
+  background: var(--fitif-white);
+  border-top: 1px solid var(--fitif-border);
+}
+
+.nav-item {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 2px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+
+  color: var(--fitif-muted);
+  font-size: 13px;
+}
+
+.nav-item.active {
+  color: var(--fitif-primary);
+  font-weight: 700;
+}
+
+.active-indicator {
+  width: 18px;
+  height: 3px;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.nav-item.active .active-indicator {
+  background: var(--fitif-primary);
+}
+
+/* 공통 버튼 */
+
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 52px;
+  padding: 12px;
+
+  border: 0;
+  border-radius: 14px;
+
+  background: var(--fitif-primary);
+  color: var(--fitif-white);
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* ==========================================
+   3. 홈 화면
+   ========================================== */
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 사용자 인사 */
+
+.greeting-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.greeting-section > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.greeting-section h2 {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.45;
+}
+
+.greeting-section p {
+  margin: 4px 0 0;
+  color: var(--fitif-muted);
+  font-size: 15px;
+}
+
+.profile-icon {
+  flex-shrink: 0;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--fitif-primary-light);
+  color: var(--fitif-primary);
+}
+
+/* 혈당 정보 카드 */
+
+.health-card {
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  background: var(--fitif-white);
+  border: 1px solid var(--fitif-border);
+  border-radius: 20px;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-heading h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.card-description {
+  margin: 0;
+  color: var(--fitif-muted);
+  font-size: 15px;
+}
+
+/* 혈당 데이터가 없는 상태 */
+
+.empty-state {
+  padding: 22px 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  text-align: center;
+}
+
+.empty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--fitif-primary-light);
+  color: var(--fitif-primary);
+}
+
+.empty-state strong {
+  font-size: 16px;
+}
+
+.empty-state p {
+  max-width: 280px;
+  margin: 0;
+
+  color: var(--fitif-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* AI 추천 카드 */
+
+.quick-action-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-height: 74px;
+  padding: 12px;
+
+  background: var(--fitif-white);
+  border: 1px solid var(--fitif-border);
+  border-radius: 14px;
+}
+
+.quick-action-card > svg:first-child {
+  flex-shrink: 0;
+  color: var(--fitif-primary);
+}
+
+.quick-action-text {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quick-action-text strong {
+  font-size: 16px;
+}
+
+.quick-action-text span {
+  color: var(--fitif-muted);
+  font-size: 14px;
+}
+
+/* 의료정보 안내 */
+
+.medical-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  padding: 12px;
+  border-radius: 14px;
+
+  background: #edf2ef;
+  color: var(--fitif-muted);
+}
+
+.medical-notice svg {
+  flex-shrink: 0;
+}
+
+.medical-notice p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 미구현 페이지 */
+
+.placeholder-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.placeholder-page h2,
+.placeholder-page p {
+  margin: 0;
+}
+
+.placeholder-page p {
+  color: var(--fitif-muted);
+  line-height: 1.6;
+}
+
+/* ==========================================
+   4. 로그인 및 회원가입 화면
+   ========================================== */
+
+/* 로그인 화면 전체 */
+
+.auth-page {
+  min-height: 100dvh;
+  padding: 24px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--fitif-bg);
+}
+
+/* 로그인 카드 */
+
+.auth-card {
+  width: 100%;
+  max-width: 390px;
+  padding: 36px 28px;
+
+  background: var(--fitif-white);
+  border: 1px solid var(--fitif-border);
+  border-radius: 24px;
+}
+
+/* 기존 문자 로고: 회원가입 등에서 사용할 수 있음 */
+
+.auth-card h1 {
+  margin: 0;
+  font-size: 36px;
+  color: var(--fitif-primary);
+}
+
+/* 로고 이미지 영역 */
+
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  margin-bottom: 36px;
+}
+
+.auth-brand-logo {
+  display: block;
+  width: 250px;
+  max-width: 100%;
+  height: auto;
+
+  margin: 0;
+  object-fit: contain;
+}
+
+/* 로고 자체에 슬로건이 있으므로 추가 설명 숨김 */
+
+.auth-brand-text {
+  display: none;
+}
+
+/* 회원가입 화면 등에 사용할 제목 */
+
+.auth-card h2 {
+  margin: 24px 0;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.auth-card p {
+  color: var(--fitif-muted);
+  line-height: 1.5;
+}
+
+/* 아이디 / 비밀번호 입력 폼 */
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-card label {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 12px;
+  padding: 12px;
+
+  background: var(--fitif-white);
+  color: var(--fitif-text);
+
+  border: 1px solid var(--fitif-border);
+  border-radius: 12px;
+
+  font-size: 16px;
+}
+
+.auth-card input:focus {
+  outline: 2px solid var(--fitif-primary);
+  outline-offset: 1px;
+}
+
+/* 로그인 버튼 */
+
+.auth-card .primary-button {
+  min-height: 52px;
+  margin-top: 8px;
+}
+
+.auth-card button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* 로그인 실패 안내 */
+
+.auth-card .auth-error {
+  color: var(--fitif-danger);
+  font-size: 14px;
+}
+
+/* 회원가입 안내 */
+
+.auth-footer {
+  margin: 24px 0 0;
+
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: var(--fitif-primary);
+  font-weight: 700;
+}
+
+/* ==========================================
+   5. 반응형 디자인
+   ========================================== */
+
+/* 작은 모바일 화면 */
+
+@media (max-width: 380px) {
+  .auth-card {
+    padding: 28px 20px;
+  }
+
+  .auth-brand-logo {
+    width: 220px;
+  }
+}
+
+/* PC에서는 모바일 앱 형태로 중앙 배치 */
+
+@media (min-width: 600px) {
+  body {
+    background: #e7eeea;
+  }
+
+  .app-shell {
+    box-shadow: 0 0 24px rgb(0 0 0 / 0.06);
+  }
+}
+
+/* 회원가입 입력 안내 문구 */
+.auth-card input::placeholder {
+  color: #9aa9a2;
+  font-size: 14px;
+}
+
+/* 회원가입·로그인 버튼 상호작용 */
+.auth-card .primary-button:hover:not(:disabled) {
+  background: #0e6252;
+}
+
+/* 키보드 접근성 */
+.auth-card .primary-button:focus-visible,
+.auth-footer a:focus-visible {
+  outline: 3px solid #5db6a4;
+  outline-offset: 3px;
+}
+
+/* 회원가입 성별 선택창 */
+.auth-card select {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 12px;
+  padding: 12px;
+
+  border: 1px solid var(--fitif-border);
+  border-radius: 12px;
+
+  background: white;
+  color: var(--fitif-text);
+  font-size: 16px;
+}
+
+.auth-card select:focus {
+  outline: 2px solid var(--fitif-primary);
+  outline-offset: 1px;
+}
+/* 개인정보 수집·이용 동의 영역 */
+
+.privacy-consent {
+  margin: 8px 0 12px;
+  padding: 14px;
+  border: 1px solid var(--fitif-border);
+  border-radius: 12px;
+  background: #f8faf9;
+}
+
+.privacy-consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+/* 기존 .auth-card input의 전체 너비 설정 덮어쓰기 */
+.auth-card .privacy-consent input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--fitif-primary);
+}
+
+.privacy-consent-label span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.privacy-consent-label strong {
+  font-size: 14px;
+  color: var(--fitif-text);
+}
+
+.privacy-consent-label small {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fitif-muted);
+}
+
+.privacy-details {
+  margin: 12px 0 0 28px;
+  font-size: 12px;
+  color: var(--fitif-muted);
+}
+
+.privacy-details summary {
+  color: var(--fitif-primary);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.privacy-details p {
+  margin: 8px 0;
+  font-size: 12px;
+}
