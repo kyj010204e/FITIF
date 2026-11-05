@@ -19,8 +19,12 @@ FITIF Health Data API
 
 from datetime import datetime
 from .routers.glucose import router as glucose_router
+from .routers.auth import (
+    router as auth_router,
+    get_current_member,
+)
 import psycopg2
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends
 
 # backend 패키지의 DB 연결 함수
 from .database import get_connection
@@ -37,7 +41,7 @@ app = FastAPI(
 )
 # 사용자 수동 혈당 저장 API 등록
 app.include_router(glucose_router)
-
+app.include_router(auth_router)
 # ==============================================
 # 2. 기본 API
 # ==============================================
@@ -74,26 +78,14 @@ def health_check():
 
 @app.get("/api/cgm/readings")
 def get_cgm_readings(
-    member_id: int = Query(
-        ...,
-        ge=1,
-        description="혈당 기록을 조회할 사용자 ID"
-    ),
-    start_at: datetime | None = Query(
-        default=None,
-        description="조회 시작 시각 (시간대 포함)"
-    ),
-    end_at: datetime | None = Query(
-        default=None,
-        description="조회 종료 시각 (시간대 포함)"
-    ),
-    limit: int = Query(
-        default=100,
-        ge=1,
-        le=500,
-        description="최대 조회 건수 (1~500)"
-    )
+    member: dict = Depends(get_current_member),
+    start_at: datetime | None = Query(default=None),
+    end_at: datetime | None = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=500),
 ):
+    # JWT에서 확인한 사용자 ID
+    member_id = member["member_id"]
+
     """
     특정 사용자의 CGM 혈당 기록을 조회한다.
 
