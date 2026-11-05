@@ -1,0 +1,20 @@
+﻿.venv/
+__pycache__/
+.idea/
+*.pyc
+.env
+*.backup
+
+# FITIF Backend: DB 비밀번호 및 인증정보
+.env
+.env.*
+!.env.example
+
+# Python 가상환경
+.venv/
+venv/
+
+# Python 캐시 및 테스트 임시 파일
+__pycache__/
+*.pyc
+.pytest_cache/
