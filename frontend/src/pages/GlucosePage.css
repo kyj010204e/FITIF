@@ -1,0 +1,479 @@
+
+/* ==========================================
+   FITIF 혈당 관리 페이지
+   ========================================== */
+
+.glucose-page {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 100px;
+  color: #253f35;
+  box-sizing: border-box;
+}
+
+.glucose-page * {
+  box-sizing: border-box;
+}
+
+/* 상단 영역 */
+
+.glucose-page-header {
+  margin-bottom: 24px;
+}
+
+.glucose-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 22px;
+  color: #647c70;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.glucose-back-link:hover {
+  color: #127b60;
+}
+
+.glucose-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.glucose-eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #148166;
+}
+
+.glucose-title-row h1 {
+  margin: 0;
+  color: #244b3e;
+  font-size: 29px;
+  font-weight: 800;
+}
+
+.glucose-subtitle {
+  margin: 9px 0 0;
+  color: #71857a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.glucose-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  background: #e5f4ed;
+  color: #168364;
+}
+
+/* 혈당 요약 카드 */
+
+.glucose-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.glucose-summary-card {
+  min-width: 0;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #e1ebe5;
+  border-radius: 18px;
+}
+
+.glucose-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #587467;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.glucose-summary-value {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+  color: #1b5845;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.glucose-summary-value span {
+  font-size: 13px;
+  font-weight: 500;
+  color: #81968a;
+}
+
+.glucose-summary-card p {
+  margin: 10px 0 0;
+  color: #8a9b91;
+  font-size: 12px;
+}
+
+/* 공통 패널 */
+
+.glucose-panel {
+  margin-bottom: 20px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e1ebe5;
+  border-radius: 18px;
+}
+
+.glucose-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #148166;
+}
+
+.glucose-panel-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #2a4b3e;
+}
+
+/* 혈당 입력 폼 */
+
+.glucose-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 23px;
+}
+
+.glucose-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 8px;
+}
+
+.glucose-field label {
+  font-size: 13px;
+  font-weight: 650;
+  color: #425a4d;
+}
+
+.glucose-required {
+  color: #d36a58;
+}
+
+.glucose-field input,
+.glucose-field select,
+.glucose-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #dce6de;
+  border-radius: 11px;
+  background: #f9fbfa;
+  color: #294638;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.glucose-field input:focus,
+.glucose-field select:focus,
+.glucose-field textarea:focus {
+  border-color: #168364;
+  box-shadow: 0 0 0 3px rgba(22, 131, 100, 0.1);
+}
+
+.glucose-number-wrap {
+  position: relative;
+}
+
+.glucose-number-wrap input {
+  padding-right: 75px;
+}
+
+.glucose-number-wrap > span {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: #82978b;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.glucose-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.glucose-field textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+.glucose-character-count {
+  align-self: flex-end;
+  font-size: 11px;
+  color: #8a9b91;
+}
+
+/* 저장 버튼 */
+
+.glucose-save-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 11px;
+  background: #127b60;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.glucose-save-button:hover:not(:disabled) {
+  background: #0f694f;
+}
+
+.glucose-save-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 안내 메시지 */
+
+.glucose-alert {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.glucose-alert-error {
+  background: #fff2f0;
+  color: #b24338;
+}
+
+.glucose-alert-success {
+  background: #edf8f1;
+  color: #196344;
+}
+
+/* 기록 목록 */
+
+.glucose-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.glucose-refresh-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid #dce6de;
+  border-radius: 9px;
+  color: #547265;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.glucose-refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.glucose-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 165px;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  color: #82968a;
+  font-size: 13px;
+}
+
+.glucose-empty-state strong {
+  color: #4f6c5d;
+  font-size: 14px;
+}
+
+.glucose-empty-state p {
+  margin: 0;
+}
+
+.glucose-record-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.glucose-record-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 17px 18px;
+  border: 1px solid #e6eee8;
+  border-radius: 13px;
+  background: #fbfdfb;
+}
+
+.glucose-record-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 7px;
+}
+
+.glucose-record-context {
+  padding: 4px 9px;
+  border-radius: 6px;
+  color: #17795c;
+  background: #e9f5ee;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.glucose-record-info > strong {
+  color: #24523e;
+  font-size: 23px;
+}
+
+.glucose-record-info > strong small {
+  color: #809589;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.glucose-record-date {
+  color: #879a8f;
+  font-size: 12px;
+}
+
+.glucose-record-note {
+  max-width: 100%;
+  margin: 2px 0 0;
+  color: #657b6e;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.glucose-disclaimer {
+  margin-top: 18px;
+  color: #91a398;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* 작은 화면 대응 */
+
+@media (max-width: 520px) {
+  .glucose-page {
+    padding: 20px 14px 100px;
+  }
+
+  .glucose-title-row h1 {
+    font-size: 24px;
+  }
+
+  .glucose-summary-card,
+  .glucose-panel {
+    padding: 17px;
+  }
+
+  .glucose-summary-value {
+    font-size: 26px;
+  }
+
+  .glucose-field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 혈당 기록 수정·삭제 버튼 */
+
+.glucose-record-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.glucose-record-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 10px;
+  border: 1px solid #e1e9e3;
+  border-radius: 9px;
+  background: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.glucose-edit-button {
+  color: #147b60;
+}
+
+.glucose-delete-button {
+  color: #c14d49;
+}
+
+.glucose-record-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.glucose-cancel-button {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dce6de;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #647a6c;
+  cursor: pointer;
+}
+
+@media (max-width: 520px) {
+  .glucose-record-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .glucose-record-actions {
+    justify-content: flex-end;
+  }
+}

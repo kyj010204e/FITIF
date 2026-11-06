@@ -9,26 +9,34 @@ import {
   Droplets,
 } from "lucide-react";
 
+import { useAuth } from "../auth/AuthProvider";
+
 export default function HomePage() {
-  /*
-   * 현재는 인증 및 실사용 혈당 통계 API가
-   * 연결되지 않은 상태다.
-   *
-   * Figma에 있는 TIR 62%, 평균 혈당 152 등의
-   * 샘플 수치를 실제 사용자 데이터처럼 표시하지 않는다.
-   *
-   * 추후 API 연동 시 이 부분을 사용자별
-   * 실제 조회 결과로 대체할 예정이다.
-   */
+  // ==========================================
+  // 1. 로그인 사용자 정보
+  // ==========================================
+
+  // AuthProvider에서 현재 로그인 사용자 정보를 가져온다.
+  const { member } = useAuth();
+
+  // 이름이 저장되어 있으면 이름을 사용한다.
+  // 기존 회원처럼 이름이 없으면 로그인 아이디를 사용한다.
+  const displayName =
+    member?.name?.trim() || member?.login_id || "회원";
 
   return (
     <div className="home-page">
+      {/* ==================================
+          2. 사용자 맞춤 인사 영역
+          ================================== */}
 
-      {/* 1. 사용자 인사 영역 */}
       <section className="greeting-section">
         <div>
-          <h2>FITIF에 오신 것을 환영합니다</h2>
-          <p>오늘도 건강한 하루를 기록해 보세요.</p>
+          <h2>안녕하세요, {displayName}님!</h2>
+
+          <p>
+            오늘도 FITIF와 함께 건강한 하루를 시작하세요.
+          </p>
         </div>
 
         <div className="profile-icon">
@@ -36,7 +44,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. 혈당 정보 카드 */}
+      {/* ==================================
+          3. 혈당 정보 카드
+          ================================== */}
+
       <section className="health-card">
         <Link
           to="/glucose"
@@ -50,16 +61,23 @@ export default function HomePage() {
           기록한 혈당을 확인하고 관리해 보세요.
         </p>
 
+        {/*
+          현재 홈 화면에는 혈당 통계 API가 연결되지
+          않았으므로 임의의 혈당 수치를 표시하지 않는다.
+
+          추후 사용자별 혈당 조회 API를 연결하면
+          이 영역을 실제 기록 및 통계로 변경할 예정이다.
+        */}
         <div className="empty-state">
           <div className="empty-icon">
             <Droplets size={34} />
           </div>
 
-          <strong>아직 연결된 혈당 정보가 없어요</strong>
+          <strong>혈당 기록을 확인해 보세요.</strong>
 
           <p>
-            로그인과 혈당 조회 API가 연결되면
-            이곳에 내 기록이 표시됩니다.
+            혈당 관리 화면에서 혈당을 기록하고
+            기존 기록을 조회할 수 있습니다.
           </p>
         </div>
 
@@ -71,7 +89,10 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* 3. AI 추천 질문 영역 */}
+      {/* ==================================
+          4. AI 추천 질문 영역
+          ================================== */}
+
       <Link
         to="/chat"
         className="quick-action-card"
@@ -79,20 +100,26 @@ export default function HomePage() {
         <Sparkles size={24} />
 
         <div className="quick-action-text">
-          <strong>오늘의 실천과 AI 추천 질문</strong>
-          <span>운동·식단 목표를 이어가 보세요</span>
+          <strong>AI 건강 상담</strong>
+
+          <span>
+            FITIF AI와 함께 건강 관리에 대해 이야기해 보세요.
+          </span>
         </div>
 
         <ChevronRight size={20} />
       </Link>
 
-      {/* 4. 의료정보 안내 */}
+      {/* ==================================
+          5. 의료정보 안내
+          ================================== */}
+
       <div className="medical-notice">
         <Info size={20} />
 
         <p>
-          FITIF는 건강관리를 돕는 정보를 제공하며,
-          의학적 진단이나 치료를 대신하지 않습니다.
+          FITIF는 건강 관리를 돕는 정보를 제공하며,
+          의료 전문가의 진단이나 치료를 대신하지 않습니다.
         </p>
       </div>
     </div>
