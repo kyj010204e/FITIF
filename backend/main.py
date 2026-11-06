@@ -23,6 +23,7 @@ from .routers.auth import (
     router as auth_router,
     get_current_member,
 )
+from .routers.glucose_manage import router as glucose_manage_router
 import psycopg2
 from fastapi import FastAPI, HTTPException, Query, Depends
 
@@ -42,6 +43,7 @@ app = FastAPI(
 # 사용자 수동 혈당 저장 API 등록
 app.include_router(glucose_router)
 app.include_router(auth_router)
+app.include_router(glucose_manage_router)
 # ==============================================
 # 2. 기본 API
 # ==============================================

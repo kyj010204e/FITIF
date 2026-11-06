@@ -50,34 +50,47 @@ JWT_EXPIRE_MINUTES = 30
 from typing import Literal
 
 class RegisterRequest(BaseModel):
+    # 회원가입 기본 정보
     login_id: str = Field(min_length=4, max_length=20)
     password: str = Field(min_length=9, max_length=128)
 
-    name: str = Field(min_length=1, max_length=50)    
-
+    # 사용자 개인정보
+    name: str = Field(min_length=1, max_length=50)
     sex: Literal["M", "F"]
     birth_year: int = Field(ge=1900, le=2026)
+
+    # 개인정보 수집·이용 동의는 반드시 True
+    privacy_agreed: Literal[True]
 
     @field_validator("login_id")
     @classmethod
     def validate_login_id(cls, value: str) -> str:
-        # 프론트엔드와 동일한 아이디 정책
         if not re.fullmatch(r"[a-z0-9]{4,20}", value):
             raise ValueError(
                 "아이디는 영문 소문자와 숫자 4~20자여야 합니다."
             )
         return value
-    privacy_agreed: Literal[True]
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        value = value.strip()
+
+        if not value:
+            raise ValueError("이름을 입력해 주세요.")
+
+        return value
+
 
 class LoginRequest(BaseModel):
     login_id: str
     password: str
-    name: str | None = None
+
 
 class MemberResponse(BaseModel):
     member_id: int
     login_id: str
-
+    name: str | None = None
 
 # ------------------------------------------
 # 2. 공통 인증 처리
@@ -213,24 +226,25 @@ def register(data: RegisterRequest):
                     # 기존 샘플 사용자의 pseudo_code는
                     # 신규 계정에 사용하지 않는다.
                     cur.execute(
-			    """
-			    INSERT INTO public.member (
-			        login_id,
-			        password_hash,
-			        sex,
-			        birth_year
-			    )
-			    VALUES (%s, %s, %s, %s)
-			    RETURNING member_id, login_id
-			    """,
-			    (
-			        data.login_id,
-			        hashed_password,
-				data.name,
-			        data.sex,
-			        data.birth_year,
-			    ),
-			)
+                        """
+                        INSERT INTO public.member (
+                            login_id,
+                            password_hash,
+                            name,
+                            sex,
+                            birth_year
+                        )
+                        VALUES (%s, %s, %s, %s, %s)
+                        RETURNING member_id, login_id
+                        """,
+                        (
+                            data.login_id,
+                            hashed_password,
+                            data.name,
+                            data.sex,
+                            data.birth_year,
+                        ),
+                    )
                     row = cur.fetchone()
         finally:
             conn.close()
@@ -257,6 +271,7 @@ def register(data: RegisterRequest):
     return {
         "member_id": row[0],
         "login_id": row[1],
+	"name" : data.name,
     }
 
 
