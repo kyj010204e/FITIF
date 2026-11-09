@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthProvider";
 import fitifLogo from "../assets/fitif-logo.png";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, authStatus } = useAuth();
 
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
@@ -25,6 +25,21 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+  // 자동 로그인 복구 중에는 로그인 폼을 표시하지 않는다.
+  if (authStatus === "loading") {
+    return (
+      <main className="auth-page">
+        <div className="auth-card" role="status">
+          <p>로그인 상태를 확인하고 있습니다...</p>
+        </div>
+      </main>
+    );
+  }
+
+  // 이미 인증된 사용자는 홈으로 이동한다.
+  if (authStatus === "authenticated") {
+    return <Navigate to="/home" replace />;
   }
 
   return (

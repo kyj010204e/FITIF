@@ -6,7 +6,11 @@ import {
   Routes,
 } from "react-router";
 
-import { AuthProvider, useAuth } from "./auth/AuthProvider";
+import {
+  AuthProvider,
+  useAuth,
+} from "./auth/AuthProvider";
+
 import ProtectedRoute from "./auth/ProtectedRoute";
 import AppLayout from "./layouts/AppLayout";
 
@@ -18,17 +22,47 @@ import GlucosePage from "./pages/GlucosePage";
 import ChatPage from "./pages/ChatPage";
 import ProfilePage from "./pages/ProfilePage";
 
-function StartPage() {
-  const { token } = useAuth();
+// ==========================================
+// 최초 진입 페이지
+// ==========================================
 
-  // 인증된 사용자는 홈, 미인증 사용자는 로그인 화면
+function StartPage() {
+  const { authStatus } = useAuth();
+
+  // 쿠키를 통한 인증 복구가 끝날 때까지 대기
+  if (authStatus === "loading") {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#168a73",
+        }}
+      >
+        로그인 상태를 확인하고 있습니다...
+      </div>
+    );
+  }
+
   return (
     <Navigate
-      to={token ? "/home" : "/login"}
+      to={
+        authStatus === "authenticated"
+          ? "/home"
+          : "/login"
+      }
       replace
     />
   );
 }
+
+// ==========================================
+// 라우팅
+// ==========================================
 
 function AppRoutes() {
   return (
