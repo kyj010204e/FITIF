@@ -477,3 +477,126 @@
     justify-content: flex-end;
   }
 }
+
+/* ==========================================
+   혈당 기록 목록 기간 필터
+   ========================================== */
+
+.glucose-record-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 16px;
+  padding: 5px;
+  background: #f1f6f3;
+  border-radius: 12px;
+}
+
+.glucose-record-filter {
+  min-width: 0;
+  padding: 10px 4px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #71847c;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.glucose-record-filter:hover {
+  background: #e1eee8;
+  color: #176d59;
+}
+
+.glucose-record-filter.active {
+  background: #168a73;
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(22, 138, 115, 0.15);
+}
+
+.glucose-record-filter:focus-visible {
+  outline: 2px solid #168a73;
+  outline-offset: 2px;
+}
+
+.glucose-record-filter-count {
+  margin: 12px 2px 16px;
+  color: #81938a;
+  font-size: 12px;
+}
+
+.glucose-record-filter-count strong {
+  color: #168a73;
+  font-weight: 700;
+}
+
+/* 혈당 기록 헤더는 제목과 새로고침만 한 줄에 배치 */
+.glucose-list-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.glucose-list-heading .glucose-panel-heading {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+}
+
+.glucose-list-heading .glucose-panel-heading h2 {
+  margin: 0;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+.glucose-list-heading .glucose-refresh-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+}
+
+.glucose-record-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 16px;
+  padding: 5px;
+  border-radius: 12px;
+  background: #f1f6f3;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.glucose-record-filter {
+  min-width: 0;
+  padding: 9px 4px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #71847c;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.glucose-record-filter.active {
+  background: #168a73;
+  color: white;
+}
+
+.glucose-record-filter-count {
+  margin: 12px 2px 16px;
+  font-size: 12px;
+  color: #81938a;
+}
+

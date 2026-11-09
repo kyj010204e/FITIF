@@ -1,0 +1,174 @@
+
+/* ==========================================
+   직접 기간 설정
+   ========================================== */
+
+.glucose-custom-range {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid #e1ebe6;
+  border-radius: 12px;
+  background: #f6faf8;
+}
+
+.glucose-custom-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.glucose-custom-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #6f867b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.glucose-custom-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 9px 6px;
+  border: 1px solid #d9e7df;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #234a3f;
+  font-size: 12px;
+}
+
+.glucose-custom-field input:focus {
+  outline: 2px solid #168a73;
+  outline-offset: 1px;
+}
+
+.glucose-custom-separator {
+  padding-bottom: 11px;
+  color: #83968c;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .glucose-custom-range {
+    gap: 6px;
+    padding: 10px;
+  }
+
+  .glucose-custom-field input {
+    font-size: 11px;
+    padding: 8px 4px;
+  }
+}
+/* 혈당 추이 제목 및 버튼 */
+.glucose-trend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.glucose-trend-heading h2 {
+  margin: 0;
+  color: #173f35;
+  font-size: 17px;
+}
+
+.glucose-trend-heading p {
+  margin: 5px 0 0;
+  color: #82918b;
+  font-size: 12px;
+}
+
+.glucose-period-selector {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f1f6f3;
+  border-radius: 12px;
+}
+
+.glucose-period-button {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #71847c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.glucose-period-button.active {
+  background: #168a73;
+  color: white;
+  font-weight: 600;
+}
+
+/* 통계 카드 2×2 배치 */
+.glucose-trend-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.glucose-trend-stat {
+  min-width: 0;
+  padding: 13px;
+  background: #f5f9f7;
+  border: 1px solid #e4eee9;
+  border-radius: 12px;
+}
+
+.glucose-trend-stat-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #71857a;
+  font-size: 11px;
+}
+
+.glucose-trend-stat-value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  color: #173f35;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.glucose-trend-stat-value small {
+  color: #83988d;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* 그래프 표시를 위한 필수 높이 */
+.glucose-trend-chart {
+  width: 100%;
+  min-width: 0;
+  height: 270px;
+  margin-top: 8px;
+}
+
+.glucose-trend-note {
+  margin-top: 12px;
+  color: #8b9b94;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* 모바일 대응 */
+@media (max-width: 480px) {
+  .glucose-trend-chart {
+    height: 240px;
+  }
+
+  .glucose-trend-stat-value {
+    font-size: 17px;
+  }
+}

@@ -1,4 +1,4 @@
-
+import GlucoseTrendChart from "../components/GlucoseTrendChart";
 import {
   useCallback,
   useEffect,
@@ -205,21 +205,27 @@ export default function GlucosePage() {
 
   // DB에서 조회한 혈당 데이터
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
+  // 기록 목록의 기간 필터
+  // 기본값은 오늘
+  type RecordFilter = "today" | "3days" | "7days" | "all";
 
-  // 현재 수정할 기록 ID
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [recordFilter, setRecordFilter] =
+    useState<RecordFilter>("today");
 
-  // 현재 삭제 중인 기록 ID
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+    // 현재 수정할 기록 ID
+    const [editingId, setEditingId] = useState<number | null>(null);
 
-  // 비동기 요청 상태
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+    // 현재 삭제 중인 기록 ID
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  // 조회 오류와 저장·삭제 오류를 별도로 관리
-  const [loadError, setLoadError] = useState("");
-  const [formError, setFormError] = useState("");
-  const [success, setSuccess] = useState("");
+    // 비동기 요청 상태
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    // 조회 오류와 저장·삭제 오류를 별도로 관리
+    const [loadError, setLoadError] = useState("");
+    const [formError, setFormError] = useState("");
+    const [success, setSuccess] = useState("");
 
   // ============================================
   // 5. 혈당 기록 조회 (GET)
@@ -530,29 +536,126 @@ export default function GlucosePage() {
   // 10. 조회된 혈당 기록 요약
   // ============================================
 
+  
+  // ============================================
+  // 10. 혈당 요약
+  // 최근 혈당: 전체 조회 기록 중 최신값
+  // 평균 혈당: 최근 72시간 측정값 기준
+  // ============================================
+
   const summary = useMemo(() => {
-    const values = readings
+    const now = Date.now();
+    const cutoff = now - 3 * 24 * 60 * 60 * 1000;
+
+    // 전체 기록 중 가장 최근 측정값
+    const sorted = readings
+      .filter(
+        (item) =>
+          Number.isFinite(
+            new Date(item.measured_at).getTime(),
+          ) &&
+          Number.isFinite(
+            Number(item.glucose_mg_dl),
+          ),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.measured_at).getTime() -
+          new Date(a.measured_at).getTime(),
+      );
+
+    const latest =
+      sorted.length > 0
+        ? Number(sorted[0].glucose_mg_dl)
+        : null;
+
+    // 최근 3일(72시간) 측정 기록
+    const recentValues = readings
+      .filter((item) => {
+        const time = new Date(
+          item.measured_at,
+        ).getTime();
+
+        return (
+          Number.isFinite(time) &&
+          time >= cutoff &&
+          time <= now
+        );
+      })
       .map((item) => Number(item.glucose_mg_dl))
       .filter((value) => Number.isFinite(value));
 
-    if (values.length === 0) {
+    if (recentValues.length === 0) {
       return {
-        latest: null as number | null,
+        latest,
         average: null as number | null,
+        count: 0,
       };
     }
 
-    const total = values.reduce(
+    const total = recentValues.reduce(
       (sum, value) => sum + value,
       0,
     );
 
     return {
-      latest: Number(readings[0].glucose_mg_dl),
-      average: Math.round((total / values.length) * 10) / 10,
+      latest,
+      average:
+        Math.round(
+          (total / recentValues.length) * 10,
+        ) / 10,
+      count: recentValues.length,
     };
   }, [readings]);
 
+  // ============================================
+  // 기록 목록 기간별 필터
+  // ============================================
+
+  const filteredReadings = useMemo(() => {
+    if (recordFilter === "all") {
+      return readings;
+    }
+
+    const now = new Date();
+    const nowTime = now.getTime();
+
+    // 오늘 00:00:00 (브라우저 로컬 시간)
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    ).getTime();
+
+    const cutoff =
+      recordFilter === "today"
+        ? todayStart
+        : nowTime -
+          (recordFilter === "3days" ? 3 : 7) *
+            24 *
+            60 *
+            60 *
+            1000;
+
+    return readings.filter((reading) => {
+      const timestamp = new Date(
+        reading.measured_at,
+      ).getTime();
+
+      return (
+        Number.isFinite(timestamp) &&
+        timestamp >= cutoff &&
+        timestamp <= nowTime
+      );
+    });
+  }, [readings, recordFilter]);
+
+  const recordFilterLabel: Record<RecordFilter, string> = {
+    today: "오늘",
+    "3days": "최근 3일",
+    "7days": "최근 7일",
+    all: "전체",
+  };
   // ============================================
   // 11. 화면 렌더링
   // ============================================
@@ -609,7 +712,7 @@ export default function GlucosePage() {
         <div className="glucose-summary-card">
           <span className="glucose-summary-label">
             <ChartNoAxesColumn size={17} />
-            평균 혈당
+            최근 3일 평균 혈당
           </span>
 
           <div className="glucose-summary-value">
@@ -620,10 +723,13 @@ export default function GlucosePage() {
           </div>
 
           <p>
-            현재 조회된 {readings.length}개 기록 기준
+            최근 3일 측정 기록 {summary.count}건 기준
           </p>
         </div>
       </section>
+
+      {/* 혈당 시계열 그래프 */}
+      <GlucoseTrendChart readings={readings} />
 
       {/* ======================================
           혈당 입력 / 수정 영역
@@ -824,22 +930,58 @@ export default function GlucosePage() {
           ====================================== */}
 
       <section className="glucose-panel">
-        <div className="glucose-list-heading">
-          <div className="glucose-panel-heading">
-            <Clock3 size={20} />
-            <h2>혈당 기록 내역</h2>
-          </div>
-
-          <button
-            type="button"
-            className="glucose-refresh-button"
-            onClick={() => void loadReadings()}
-            disabled={loading || saving || deletingId !== null}
-          >
-            <RefreshCw size={16} />
-            새로고침
-          </button>
+      <div className="glucose-list-heading">
+        <div className="glucose-panel-heading">
+          <Clock3 size={20} />
+          <h2>혈당 기록 내역</h2>
         </div>
+
+        <button
+          type="button"
+          className="glucose-refresh-button"
+          onClick={() => void loadReadings()}
+          disabled={loading || saving || deletingId !== null}
+        >
+          <RefreshCw size={16} />
+          새로고침
+        </button>
+      </div>
+
+      {/* 기간 선택 버튼은 제목 영역 바깥에 배치 */}
+      <div
+        className="glucose-record-filters"
+        role="group"
+        aria-label="혈당 기록 조회 기간"
+      >
+        {(
+          [
+            ["today", "오늘"],
+            ["3days", "3일"],
+            ["7days", "7일"],
+            ["all", "전체"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            className={
+              recordFilter === value
+                ? "glucose-record-filter active"
+                : "glucose-record-filter"
+            }
+            aria-pressed={recordFilter === value}
+            onClick={() => setRecordFilter(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <p className="glucose-record-filter-count">
+        {recordFilterLabel[recordFilter]} 측정 기록{" "}
+        <strong>{filteredReadings.length}건</strong>
+      </p>
+
 
         {/* 조회 실패 안내 */}
         {loadError && (
@@ -859,10 +1001,14 @@ export default function GlucosePage() {
           </div>
         ) : loadError && readings.length === 0 ? (
           <div className="glucose-empty-state">
-            기록을 불러오지 못했습니다.
-            새로고침 버튼을 눌러 다시 시도해 주세요.
-          </div>
-        ) : readings.length === 0 ? (
+            <strong>
+            선택한 기간에 혈당 기록이 없습니다.
+            </strong>
+            <p>
+              다른 기간을 선택하거나 새 기록을 등록해 주세요.
+            </p>
+            </div>
+        ) : filteredReadings.length === 0 ? (
           <div className="glucose-empty-state">
             <Droplets size={32} />
             <strong>
@@ -874,7 +1020,7 @@ export default function GlucosePage() {
           </div>
         ) : (
           <div className="glucose-record-list">
-            {readings.map((reading) => (
+            {filteredReadings.map((reading) => (
               <article
                 key={reading.reading_id}
                 className="glucose-record-item"
