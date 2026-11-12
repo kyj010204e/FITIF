@@ -287,6 +287,44 @@ export default function GlucosePage() {
     }
   }, [token]);
 
+  const loadCgmReadings = useCallback(
+    async (start: number, end: number, signal: AbortSignal) => {
+      if (!token) return [];
+
+      const records: GlucoseReading[] = [];
+
+      // 요청당 500건 제한을 고려해 최대 24시간씩 조회한다.
+      for (let from = start; from < end; ) {
+        const to = Math.min(from + 86_400_000, end);
+        const params = new URLSearchParams({
+          start_at: new Date(from).toISOString(),
+          end_at: new Date(to).toISOString(),
+          limit: "500",
+        });
+
+        const response = await fetch(`/api/cgm/readings?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+          signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(await getApiError(response, "CGM 기록을 불러오지 못했습니다."));
+        }
+
+        const batch = parseReadings(await response.json());
+        if (batch.length === 500) {
+          throw new Error("CGM 조회 한도에 도달했습니다. 조회 기간을 줄여 주세요.");
+        }
+
+        records.push(...batch);
+        from = to;
+      }
+
+      return records;
+    },
+    [token],
+  );
   // 페이지가 처음 열릴 때 혈당 기록 조회
   useEffect(() => {
     void loadReadings();
@@ -729,7 +767,7 @@ export default function GlucosePage() {
       </section>
 
       {/* 혈당 시계열 그래프 */}
-      <GlucoseTrendChart readings={readings} />
+      <GlucoseTrendChart readings={readings} loadCgmReadings={loadCgmReadings} />
 
       {/* ======================================
           혈당 입력 / 수정 영역

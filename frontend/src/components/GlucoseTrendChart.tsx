@@ -1,5 +1,4 @@
-
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -20,6 +19,11 @@ type GlucoseReading = {
 
 type Props = {
   readings: GlucoseReading[];
+  loadCgmReadings: (
+    start: number,
+    end: number,
+    signal: AbortSignal,
+  ) => Promise<GlucoseReading[]>;
 };
 
 type Period = 1 | 3 | 7 | "custom";
@@ -54,6 +58,7 @@ function formatTooltipDate(timestamp: number): string {
 
 export default function GlucoseTrendChart({
   readings,
+  loadCgmReadings,
 }: Props) {
   // 기본 기간: 최근 3일
   const [period, setPeriod] = useState<Period>(3);
@@ -71,6 +76,15 @@ export default function GlucoseTrendChart({
 
   const today = localDateString(new Date());
 
+  const [appliedDates, setAppliedDates] = useState<{
+    startDate: string;
+    endDate: string;
+  } | null>(null);
+
+  const canApplyDates = Boolean(
+    startDate && endDate && startDate <= endDate && endDate <= today,
+  );
+
   // ============================================
   // 1. 조회 기간 계산
   // ============================================
@@ -80,21 +94,17 @@ export default function GlucoseTrendChart({
 
     // 직접 선택한 날짜 범위
     if (period === "custom") {
-      if (
-        !startDate ||
-        !endDate ||
-        startDate > endDate
-      ) {
+      if (!appliedDates) {
         return null;
       }
 
       const start = new Date(
-        `${startDate}T00:00:00`,
+        `${appliedDates.startDate}T00:00:00`,
       ).getTime();
 
-      // 종료일 다음 날 00:00 (미포함)
+      // 선택한 종료일 전체를 포함하도록 다음 날 자정을 경계로 사용한다.
       const endExclusive = new Date(
-        `${endDate}T00:00:00`,
+        `${appliedDates.endDate}T00:00:00`,
       );
 
       endExclusive.setDate(
@@ -117,7 +127,6 @@ export default function GlucoseTrendChart({
       return {
         start,
         end,
-        endExclusive: true,
       };
     }
 
@@ -125,9 +134,47 @@ export default function GlucoseTrendChart({
     return {
       start: now - period * DAY_MS,
       end: now,
-      endExclusive: false,
     };
-  }, [period, startDate, endDate]);
+  }, [period, appliedDates]);
+
+  const [cgmResult, setCgmResult] = useState<{
+    range: typeof dateRange;
+    loader: typeof loadCgmReadings;
+    readings: GlucoseReading[];
+    error: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!dateRange) return;
+
+    const controller = new AbortController();
+    loadCgmReadings(dateRange.start, dateRange.end, controller.signal)
+      .then((records) => {
+        if (controller.signal.aborted) return;
+        setCgmResult({
+          range: dateRange,
+          loader: loadCgmReadings,
+          readings: records,
+          error: "",
+        });
+      })
+      .catch((err: unknown) => {
+        if (controller.signal.aborted) return;
+        setCgmResult({
+          range: dateRange,
+          loader: loadCgmReadings,
+          readings: [],
+          error: err instanceof Error ? err.message : "CGM 조회 중 오류가 발생했습니다.",
+        });
+      });
+
+    return () => controller.abort();
+  }, [dateRange, loadCgmReadings]);
+
+  const currentCgmResult =
+    cgmResult?.range === dateRange && cgmResult.loader === loadCgmReadings
+      ? cgmResult
+      : null;
 
   // ============================================
   // 2. 선택 기간에 해당하는 데이터
@@ -138,7 +185,7 @@ export default function GlucoseTrendChart({
       return [];
     }
 
-    return readings
+    return [...readings, ...(currentCgmResult?.readings ?? [])]
       .map((item) => ({
         reading_id: item.reading_id,
         timestamp: new Date(
@@ -152,16 +199,12 @@ export default function GlucoseTrendChart({
           Number.isFinite(item.glucose) &&
           item.glucose > 0 &&
           item.timestamp >= dateRange.start &&
-          (
-            dateRange.endExclusive
-              ? item.timestamp < dateRange.end
-              : item.timestamp <= dateRange.end
-          ),
+          item.timestamp < dateRange.end,
       )
       .sort(
         (a, b) => a.timestamp - b.timestamp,
       );
-  }, [readings, dateRange]);
+  }, [readings, dateRange, currentCgmResult]);
 
   // ============================================
   // 3. 선택 기간 통계
@@ -339,15 +382,24 @@ export default function GlucoseTrendChart({
               }
             />
           </div>
+          <button
+            type="button"
+            className="glucose-period-button active"
+            disabled={!canApplyDates}
+            onClick={() => setAppliedDates({ startDate, endDate })}
+          >
+            조회
+          </button>
         </div>
+      )}
+
+      {currentCgmResult?.error && (
+        <p role="alert">{currentCgmResult.error}</p>
       )}
 
       {dateRange === null ? (
         <div className="glucose-trend-empty">
-          <strong>날짜 범위를 확인해 주세요.</strong>
-          <p>
-            시작일은 종료일보다 늦을 수 없습니다.
-          </p>
+          <strong>시작일과 종료일을 선택하고 조회를 눌러 주세요.</strong>
         </div>
       ) : chartData.length === 0 ? (
         <div className="glucose-trend-empty">
@@ -478,12 +530,16 @@ export default function GlucoseTrendChart({
                   name="혈당"
                   stroke="#168a73"
                   strokeWidth={2.5}
-                  dot={{
-                    r: 4,
-                    stroke: "#168a73",
-                    strokeWidth: 2,
-                    fill: "#ffffff",
-                  }}
+                  dot={
+                    chartData.length <= 80
+                      ? {
+                          r: 4,
+                          stroke: "#168a73",
+                          strokeWidth: 2,
+                          fill: "#ffffff",
+                        }
+                      : false
+                  }
                   activeDot={{
                     r: 6,
                     stroke: "#168a73",

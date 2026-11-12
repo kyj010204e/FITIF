@@ -1,0 +1,73 @@
+.health-records {
+  padding: 22px 16px;
+  color: #203d36;
+}
+
+.health-records h1 {
+  margin: 0 0 18px;
+  font-size: 1.5rem;
+  line-height: 1.35;
+}
+
+.health-records__list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.health-records__card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 76px;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #dfe9e4;
+  border-radius: 16px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+}
+
+.health-records__icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e2f2ec;
+  color: #127663;
+}
+
+.health-records__label {
+  display: grid;
+  gap: 4px;
+}
+
+.health-records__label > span,
+.health-records > p {
+  color: #597068;
+  line-height: 1.45;
+}
+
+.health-records__label > span {
+  font-size: 0.875rem;
+}
+
+.health-records__back {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 16px;
+  color: #127663;
+  text-decoration: none;
+}
+
+.health-records__card:focus-visible,
+.health-records__back:focus-visible {
+  outline: 2px solid #127663;
+  outline-offset: 2px;
+}
