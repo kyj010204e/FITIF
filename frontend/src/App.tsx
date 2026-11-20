@@ -14,13 +14,13 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import HealthRecordsPage, {
-  MedicalDocumentPage,
   WearableRegistrationPage,
 } from "./pages/HealthRecordsPage";
+import MedicalDocumentPage from "./pages/MedicalDocumentPage";
 import GlucosePage from "./pages/GlucosePage";
 import ChatPage from "./pages/ChatPage";
 import ProfilePage from "./pages/ProfilePage";
-
+import StressPage from "./pages/StressPage";
 
 function StartPage() {
   const { authStatus } = useAuth();
@@ -73,6 +73,7 @@ function AppRoutes() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/records" element={<HealthRecordsPage />} />
           <Route path="/records/glucose" element={<GlucosePage />} />
+	  <Route path="/records/stress" element={<StressPage />} />
           <Route path="/glucose" element={<Navigate to="/records/glucose" replace />} />
           <Route path="/records/documents" element={<MedicalDocumentPage />} />
           <Route path="/records/wearables" element={<WearableRegistrationPage />} />

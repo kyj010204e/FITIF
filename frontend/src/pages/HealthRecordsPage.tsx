@@ -68,15 +68,6 @@ function PendingRecordPage({ title, message }: { title: string; message: string 
   );
 }
 
-export function MedicalDocumentPage() {
-  return (
-    <PendingRecordPage
-      title="의료문서 등록"
-      message="의료문서 업로드와 OCR 연결을 준비 중이에요."
-    />
-  );
-}
-
 export function WearableRegistrationPage() {
   return (
     <PendingRecordPage

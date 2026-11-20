@@ -71,3 +71,221 @@
   outline: 2px solid #127663;
   outline-offset: 2px;
 }
+
+.document-ocr__panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #dfe9e4;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.document-ocr__panel label {
+  font-weight: 700;
+}
+
+.document-ocr__panel p,
+.document-ocr__panel h2,
+.document-ocr__panel ul {
+  margin: 0;
+}
+
+.document-ocr__panel p {
+  color: #597068;
+}
+
+.document-ocr__panel input {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+}
+
+.document-ocr__panel button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #127663;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+}
+
+.document-ocr__panel button:disabled {
+  background: #e2ebe7;
+  color: #526c63;
+}
+
+.document-ocr__panel :focus-visible {
+  outline: 2px solid #127663;
+  outline-offset: 2px;
+}
+
+.document-ocr__result {
+  margin-top: 16px;
+}
+
+.document-ocr__result h2 {
+  font-size: 1.125rem;
+}
+
+.health-records > .document-ocr__error {
+  color: #a42b2b;
+}
+
+.document-editor__original {
+  display: block;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+.document-editor__paper {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #dfe9e4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.document-editor__paper + .document-editor__paper {
+  margin-top: 12px;
+}
+
+.document-editor__paper h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.document-editor__table-wrap {
+  overflow-x: auto;
+}
+
+.document-editor__table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.document-editor__table-wrap :is(th, td) {
+  min-width: 60px;
+  padding: 0;
+  border: 1px solid #c8d8d3;
+  vertical-align: top;
+}
+
+.document-editor__table-wrap th {
+  background: #edf4f1;
+}
+
+.document-ocr__panel .document-editor__text {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px;
+  border-radius: 3px;
+  background: transparent;
+  color: #203d36;
+  font-weight: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.document-ocr__panel .document-editor__text:hover,
+.document-ocr__panel .document-editor__text:focus-visible {
+  background: #e2f2ec;
+}
+
+.document-editor__dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid #c8d8d3;
+  border-radius: 12px;
+  box-sizing: border-box;
+  color: #203d36;
+}
+
+.document-editor__dialog::backdrop {
+  background: rgb(20 38 32 / 50%);
+}
+
+.document-editor__dialog form {
+  display: grid;
+  gap: 12px;
+}
+
+.document-editor__dialog textarea {
+  padding: 8px;
+  border: 1px solid #96b2a8;
+  border-radius: 8px;
+  font: inherit;
+  resize: vertical;
+}
+
+.document-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.document-editor__actions button[type="button"] {
+  background: #e2ebe7;
+  color: #203d36;
+}
+
+.document-editor__saved-text {
+  display: block;
+  padding: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.document-save fieldset,
+.document-save__row {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #dfe9e4;
+  border-radius: 8px;
+}
+
+.document-save legend {
+  padding: 0 4px;
+  font-weight: 700;
+}
+
+.document-save label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.document-save input,
+.document-save select {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid #96b2a8;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.document-save .document-save__confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.document-save__confirm input {
+  width: auto;
+}
+
+.document-ocr__panel .document-ocr__error {
+  color: #a42b2b;
+}

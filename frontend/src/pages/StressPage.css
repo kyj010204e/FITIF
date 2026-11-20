@@ -1,0 +1,100 @@
+.stress-page {
+  padding: 20px 14px;
+  color: var(--fitif-text);
+}
+
+.stress-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--fitif-primary);
+  font-weight: 700;
+}
+
+.stress-page h1 {
+  margin: 8px 0 16px;
+  font-size: 27px;
+}
+
+.stress-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--fitif-border);
+  border-radius: 20px;
+  background: var(--fitif-white);
+}
+
+.stress-card h2,
+.stress-card p {
+  margin: 0;
+}
+
+.stress-card h2 { font-size: 20px; }
+.stress-card p { color: var(--fitif-muted); }
+
+.stress-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.stress-options button {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  min-height: 66px;
+  padding: 8px 1px;
+  border: 1px solid var(--fitif-border);
+  border-radius: 12px;
+  color: var(--fitif-text);
+  background: var(--fitif-bg);
+  word-break: keep-all;
+  cursor: pointer;
+}
+
+.stress-options strong { font-size: 19px; }
+.stress-options span { font-size: clamp(10px, 3vw, 13px); }
+
+.stress-options button[aria-pressed="true"] {
+  border-color: var(--fitif-primary);
+  background: var(--fitif-primary);
+  color: var(--fitif-white);
+}
+
+.stress-card button:focus-visible,
+.stress-back:focus-visible {
+  outline: 2px solid var(--fitif-primary);
+  outline-offset: 2px;
+}
+
+.stress-feedback {
+  display: grid;
+  place-items: center;
+  min-height: 126px;
+  border-radius: 14px;
+  background: var(--fitif-primary-light);
+}
+
+.stress-reaction {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  animation: stress-reveal 320ms ease-out both;
+}
+
+.stress-emoji {
+  font-size: 52px;
+  line-height: 1.1;
+}
+
+@keyframes stress-reveal {
+  0% { opacity: 0; transform: translateY(9px) scale(.78); }
+  72% { opacity: 1; transform: translateY(0) scale(1.05); }
+  100% { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stress-reaction { animation: none; }
+}
