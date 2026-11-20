@@ -13,22 +13,50 @@ import AppLayout from "./layouts/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
-import HealthRecordPage from "./pages/HealthRecordPage";
+import HealthRecordsPage, {
+  WearableRegistrationPage,
+} from "./pages/HealthRecordsPage";
+import MedicalDocumentPage from "./pages/MedicalDocumentPage";
 import GlucosePage from "./pages/GlucosePage";
 import ChatPage from "./pages/ChatPage";
 import ProfilePage from "./pages/ProfilePage";
+import StressPage from "./pages/StressPage";
 
 function StartPage() {
-  const { token } = useAuth();
+  const { authStatus } = useAuth();
 
-  // 인증된 사용자는 홈, 미인증 사용자는 로그인 화면
+  // Refresh Token으로 로그인 복구가 끝날 때까지 대기
+  if (authStatus === "loading") {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#168a73",
+        }}
+      >
+        로그인 상태를 확인하고 있습니다...
+      </div>
+    );
+  }
+
+  // 인증 복구 결과에 따라 이동
   return (
     <Navigate
-      to={token ? "/home" : "/login"}
+      to={
+        authStatus === "authenticated"
+          ? "/home"
+          : "/login"
+      }
       replace
     />
   );
 }
+
 
 function AppRoutes() {
   return (
@@ -43,8 +71,12 @@ function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/home" element={<HomePage />} />
-          <Route path="/records" element={<HealthRecordPage />} />
-          <Route path="/glucose" element={<GlucosePage />} />
+          <Route path="/records" element={<HealthRecordsPage />} />
+          <Route path="/records/glucose" element={<GlucosePage />} />
+	  <Route path="/records/stress" element={<StressPage />} />
+          <Route path="/glucose" element={<Navigate to="/records/glucose" replace />} />
+          <Route path="/records/documents" element={<MedicalDocumentPage />} />
+          <Route path="/records/wearables" element={<WearableRegistrationPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>

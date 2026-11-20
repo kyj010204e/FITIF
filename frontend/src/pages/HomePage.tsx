@@ -1,126 +1,101 @@
-
+import { ChevronRight, Info, Mic, Send } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router";
 
-import {
-  UserRound,
-  ChevronRight,
-  Sparkles,
-  Info,
-  Droplets,
-} from "lucide-react";
-
 import { useAuth } from "../auth/AuthProvider";
+import { homeHealthCards, type HealthSummaryCard } from "./homeHealthCards";
+import { getSummaryPeriod, summaryPeriods } from "./homeSummaryPeriod";
+import "./HomePage.css";
 
-export default function HomePage() {
-  // ==========================================
-  // 1. 로그인 사용자 정보
-  // ==========================================
-
-  // AuthProvider에서 현재 로그인 사용자 정보를 가져온다.
-  const { member } = useAuth();
-
-  // 이름이 저장되어 있으면 이름을 사용한다.
-  // 기존 회원처럼 이름이 없으면 로그인 아이디를 사용한다.
-  const displayName =
-    member?.name?.trim() || member?.login_id || "회원";
+function SummaryMetric({
+  metric,
+  showLabel,
+}: {
+  metric: HealthSummaryCard["metrics"][number];
+  showLabel: boolean;
+}) {
+  const { label, Preview } = metric;
+  const [period, setPeriod] = useState(() => getSummaryPeriod(1));
 
   return (
-    <div className="home-page">
-      {/* ==================================
-          2. 사용자 맞춤 인사 영역
-          ================================== */}
+    <div className="home-card-metric">
+      {showLabel && <span className="home-card-label">{label}</span>}
+      <div className="home-card-periods" role="group" aria-label={`${label} 조회 기간`}>
+        {summaryPeriods.map(({ days, label: periodLabel }) => (
+          <button
+            key={days}
+            type="button"
+            aria-pressed={period.days === days}
+            onClick={() => setPeriod(getSummaryPeriod(days))}
+          >
+            {periodLabel}
+          </button>
+        ))}
+      </div>
+      {Preview ? <Preview period={period} /> : <span className="home-card-status">연동 전</span>}
+    </div>
+  );
+}
 
-      <section className="greeting-section">
-        <div>
-          <h2>안녕하세요, {displayName}님!</h2>
+function SummaryCard({ card }: { card: HealthSummaryCard }) {
+  const { icon: Icon, title, metrics, href } = card;
+  const titleContent = (
+    <>
+      <span className="home-card-icon"><Icon size={18} aria-hidden="true" /></span>
+      <span>{title}</span>
+    </>
+  );
 
-          <p>
-            오늘도 FITIF와 함께 건강한 하루를 시작하세요.
-          </p>
-        </div>
+  return (
+    <article className="home-summary-card">
+      <h2>
+        {href ? (
+          <Link to={href} className="home-card-detail-link">
+            {titleContent}
+            <ChevronRight size={13} aria-hidden="true" />
+          </Link>
+        ) : titleContent}
+      </h2>
+      <div className="home-card-metrics">
+        {metrics.map((metric) => (
+          <SummaryMetric key={metric.id} metric={metric} showLabel={metrics.length > 1} />
+        ))}
+      </div>
+    </article>
+  );
+}
 
-        <div className="profile-icon">
-          <UserRound size={28} />
-        </div>
-      </section>
+export default function HomePage() {
+  const { member } = useAuth();
+  const displayName = member?.name?.trim() || member?.login_id || "회원";
 
-      {/* ==================================
-          3. 혈당 정보 카드
-          ================================== */}
+  return (
+    <div className="home-page home-summary">
+      <header className="home-summary-heading">
+        <h1 id="health-summary-title">건강 요약</h1>
+        <p>안녕하세요, {displayName}님!</p>
+      </header>
 
-      <section className="health-card">
-        <Link
-          to="/glucose"
-          className="card-heading"
-        >
-          <h3>내 혈당 기록</h3>
-          <ChevronRight size={22} />
-        </Link>
-
-        <p className="card-description">
-          기록한 혈당을 확인하고 관리해 보세요.
-        </p>
-
-        {/*
-          현재 홈 화면에는 혈당 통계 API가 연결되지
-          않았으므로 임의의 혈당 수치를 표시하지 않는다.
-
-          추후 사용자별 혈당 조회 API를 연결하면
-          이 영역을 실제 기록 및 통계로 변경할 예정이다.
-        */}
-        <div className="empty-state">
-          <div className="empty-icon">
-            <Droplets size={34} />
+      {homeHealthCards.length > 0 && (
+        <section className="home-summary-grid" aria-labelledby="health-summary-title">
+          <div className="home-summary-figure" aria-hidden="true">
+            <svg viewBox="0 0 110 300" focusable="false">
+              <path d="M55 7c-14 0-22 10-22 23 0 10 5 18 11 23v10L26 71c-8 4-12 12-14 23L5 147c-2 15-3 27-3 35 0 5 7 7 9 1l9-41 6-30 1 58 5 40 2 67-5 10c-2 4 0 7 4 7h11c4 0 6-3 6-7l2-73 3-34 3 34 2 73c0 4 2 7 6 7h11c4 0 6-3 4-7l-5-10 2-67 5-40 1-58 6 30 9 41c2 6 9 4 9-1 0-8-1-20-3-35l-7-53c-2-11-6-19-14-23l-18-8V53c6-5 11-13 11-23 0-13-8-23-22-23Z" />
+            </svg>
           </div>
+          {homeHealthCards.map((card) => <SummaryCard key={card.id} card={card} />)}
+        </section>
+      )}
 
-          <strong>혈당 기록을 확인해 보세요.</strong>
-
-          <p>
-            혈당 관리 화면에서 혈당을 기록하고
-            기존 기록을 조회할 수 있습니다.
-          </p>
-        </div>
-
-        <Link
-          className="primary-button"
-          to="/glucose"
-        >
-          혈당 관리 화면으로 이동
-        </Link>
-      </section>
-
-      {/* ==================================
-          4. AI 추천 질문 영역
-          ================================== */}
-
-      <Link
-        to="/chat"
-        className="quick-action-card"
-      >
-        <Sparkles size={24} />
-
-        <div className="quick-action-text">
-          <strong>AI 건강 상담</strong>
-
-          <span>
-            FITIF AI와 함께 건강 관리에 대해 이야기해 보세요.
-          </span>
-        </div>
-
-        <ChevronRight size={20} />
+      <Link to="/chat" className="home-summary-chat">
+        <span className="home-chat-icon"><Mic size={21} aria-hidden="true" /></span>
+        <strong>FITIF AI에 건강 이야기하기</strong>
+        <Send size={19} aria-hidden="true" />
       </Link>
 
-      {/* ==================================
-          5. 의료정보 안내
-          ================================== */}
-
       <div className="medical-notice">
-        <Info size={20} />
-
-        <p>
-          FITIF는 건강 관리를 돕는 정보를 제공하며,
-          의료 전문가의 진단이나 치료를 대신하지 않습니다.
-        </p>
+        <Info size={20} aria-hidden="true" />
+        <p>FITIF는 건강 관리를 돕는 정보를 제공하며, 의료 전문가의 진단이나 치료를 대신하지 않습니다.</p>
       </div>
     </div>
   );
