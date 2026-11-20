@@ -18,6 +18,7 @@ FITIF Health Data API
 """
 
 from datetime import datetime
+from .routers.gemma_chat import router as gemma_chat_router
 from .routers.glucose import router as glucose_router
 from .routers.auth import (
     router as auth_router,
@@ -26,6 +27,9 @@ from .routers.auth import (
 from .routers.glucose_manage import router as glucose_manage_router
 import psycopg2
 from fastapi import FastAPI, HTTPException, Query, Depends
+
+from .routers.document_ocr import router as document_ocr_router
+from .routers.stress import router as stress_router
 
 # backend 패키지의 DB 연결 함수
 from .database import get_connection
@@ -43,7 +47,10 @@ app = FastAPI(
 # 사용자 수동 혈당 저장 API 등록
 app.include_router(glucose_router)
 app.include_router(auth_router)
+app.include_router(gemma_chat_router)
+app.include_router(document_ocr_router)
 app.include_router(glucose_manage_router)
+app.include_router(stress_router)
 # ==============================================
 # 2. 기본 API
 # ==============================================
